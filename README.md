@@ -48,6 +48,7 @@ Plus [docs/SNIPPET_DUELS.md](docs/SNIPPET_DUELS.md): 14 "which goes to productio
 - [docs/INTERVIEW_FORMATS.md](docs/INTERVIEW_FORMATS.md) — JPMC, Citi Karat, Amazon, Morningstar, AI rounds (with candidate-report sources) + Karat Java fundamentals answers
 - [docs/TOOLS.md](docs/TOOLS.md) — tools by layer, AI reviewers in 2026, and **measured** results: what PMD/SpotBugs/Find Security Bugs caught in these PRs and what they missed
 - [docs/SNIPPET_DUELS.md](docs/SNIPPET_DUELS.md) — 14 snippet pairs
+- [docs/TALKING_ABOUT_THIS_PROJECT.md](docs/TALKING_ABOUT_THIS_PROJECT.md) — how to talk about this kit and your review method in an interview
 
 ## Setup
 
