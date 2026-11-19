@@ -1,0 +1,107 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.1.2'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'pmd'
+    id 'jacoco'
+    id 'com.github.spotbugs' version '6.5.13'
+}
+
+group = 'com.interview'
+version = '1.0.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// src/main/java      = the "pull requests" you review (deliberately buggy)
+// solutions/java     = reference fixes, same classes and public API
+// src/test/java      = one test suite, run against either of them
+sourceSets {
+    solution {
+        java {
+            srcDir 'solutions/java'
+        }
+    }
+}
+
+configurations {
+    solutionImplementation.extendsFrom implementation
+    solutionRuntimeOnly.extendsFrom runtimeOnly
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.security:spring-security-crypto'
+
+    // Security rules for SpotBugs (SQL injection, weak crypto, path traversal, ...)
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.14.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'com.h2database:h2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// This is a practice kit, not an application.
+tasks.named('bootJar') { enabled = false }
+tasks.named('jar') { enabled = true }
+
+def exerciseFilter = { Test task ->
+    if (project.hasProperty('ex')) {
+        task.filter { includeTestsMatching "review.${project.property('ex')}*" }
+    }
+}
+
+// ./gradlew test      -> tests against the reference solutions: always green.
+tasks.named('test', Test) {
+    description = 'Runs the exercise tests against the reference solutions in solutions/java.'
+    useJUnitPlatform()
+    classpath = sourceSets.test.output + sourceSets.solution.output + configurations.testRuntimeClasspath
+    dependsOn tasks.named('solutionClasses')
+    exerciseFilter(it)
+    testLogging { events 'passed', 'failed' }
+}
+
+// ./gradlew practice -Pex=ex01   -> the same tests against YOUR code in src/main: red until you fix it.
+tasks.register('practice', Test) {
+    description = 'Runs the exercise tests against your code in src/main (use -Pex=ex01 for one exercise).'
+    group = 'verification'
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    exerciseFilter(it)
+    ignoreFailures = true
+    outputs.upToDateWhen { false }
+    testLogging {
+        events 'passed', 'failed'
+        exceptionFormat = 'short'
+    }
+}
+
+// Static analysis on the buggy code: compare what tools find with what you found.
+//   ./gradlew pmdMain spotbugsMain   -> build/reports/pmd/main.html, build/reports/spotbugs/main.html
+pmd {
+    toolVersion = '7.29.0'
+    ignoreFailures = true
+    ruleSets = []
+    ruleSetFiles = files('config/pmd/review-rules.xml')
+}
+spotbugs {
+    ignoreFailures = true
+}
+tasks.withType(com.github.spotbugs.snom.SpotBugsTask).configureEach {
+    reports {
+        html { required = true }
+        xml { required = true }
+    }
+}
+tasks.named('pmdTest') { enabled = false }
+tasks.named('spotbugsTest') { enabled = false }

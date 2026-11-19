@@ -1,0 +1,35 @@
+# Build
+.gradle/
+build/
+out/
+bin/
+!**/src/main/**/build/
+!**/src/test/**/build/
+!**/src/main/**/bin/
+
+# The wrapper jar MUST be committed, or ./gradlew fails on a fresh clone
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and local databases
+*.log
+logs/
+*.mv.db
+*.trace.db

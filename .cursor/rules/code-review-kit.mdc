@@ -1,0 +1,11 @@
+---
+description: Code review interview kit conventions
+alwaysApply: true
+---
+
+# Code review kit
+
+- The code in `src/main/java/review/**` is intentionally buggy (practice PRs). Do not fix it unless the user explicitly asks to practice a fix; when helping, guide with questions and the review method first.
+- Reference fixes live in `solutions/java` with the same public API; `./gradlew test` must stay green.
+- `./gradlew practice -Pex=exNN` is expected to fail until the user fixes that exercise.
+- Model answers: `solutions/answers/`. Method and checklist: `docs/`.
